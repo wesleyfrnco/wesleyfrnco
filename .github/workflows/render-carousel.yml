@@ -1,0 +1,34 @@
+name: render-carousel
+
+on:
+  repository_dispatch:
+    types: [render-carousel]
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install puppeteer
+
+      - name: Renderizar slides
+        run: node render.js
+
+      - name: Commit e push dos JPEGs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts/
+          git diff --staged --quiet || git commit -m "Render automático de carrossel"
+          git push
